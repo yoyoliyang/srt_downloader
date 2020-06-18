@@ -2,6 +2,9 @@
 
 import requests
 import json
+import os
+import re
+import rarfile
 
 token = 'sYEoLsFpxJ6nu7Rgk9DA8bjCZ1TBkSG9'
 
@@ -66,6 +69,48 @@ class SubUrl:
             return None
 
 
+def get_video_name():
+    ls = os.walk('.')
+    try:
+        while True:
+            file_list = next(ls)
+            file_list_3 = file_list[2]
+            for file in file_list_3:
+                m = re.search('.mp4|.mkv', file)
+                try:
+                    print(m.group(0), 'found', file)
+                    video_name = file.split(m.group(0))[0]
+                    return video_name
+                except AttributeError:
+                    print('.', end='')
+    except StopIteration:
+        return None
+
+
+def unc(file, sub_name):
+    # file是下载后的文件，压缩包。sub_name视频文件名称，保存为sub_name.srt。
+    f = rarfile.RarFile(file)
+    f_list = []
+    for s in f.infolist():
+        filename = s.filename
+        # print(filename)
+        if 'chs&eng.srt' in filename:
+            f_list.append(filename)
+        if '简体.srt' in filename:
+            f_list.append(filename)
+        if 'chs.srt' in filename:
+            f_list.append(filename)
+    the_file = f_list[0]
+    the_file_ext = f_list[0].split('.')[-1]
+    print(the_file)
+    with f.open(the_file) as x:
+        for ln in x:
+            with open(sub_name+'.'+the_file_ext, 'wb') as y:
+                for ln in x:
+                    y.write(ln)
+    print('write sub file complate')
+
+
 # main func
 while True:
     sub_name = input('Input the movie name:')
@@ -97,13 +142,15 @@ if subs:
             local_filename = download_url.split('/')[-1]
             local_filename = local_filename.split('?')[0]
             print(download_url, '\n', 'filename:', local_filename)
-
             with requests.get(download_url, stream=True) as r:
                 r.raise_for_status()
                 with open(local_filename, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=1024):
                         f.write(chunk)
                 print('', end='.')
-        print('download complate')
+    print('download complate')
+    file = get_video_name()
+    print('change to the same name as the sub')
+    unc(local_filename, file)
 else:
     print('subs not found')
