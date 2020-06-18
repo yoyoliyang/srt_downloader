@@ -5,6 +5,7 @@ import json
 import os
 import re
 import rarfile
+import zipfile
 
 token = 'sYEoLsFpxJ6nu7Rgk9DA8bjCZ1TBkSG9'
 
@@ -89,19 +90,27 @@ def get_video_name():
 
 def unc(file, sub_name):
     # file是下载后的文件，压缩包。sub_name视频文件名称，保存为sub_name.srt。
-    f = rarfile.RarFile(file)
-    f_list = []
-    for s in f.infolist():
-        filename = s.filename
-        # print(filename)
-        if 'chs&eng.srt' in filename:
-            f_list.append(filename)
-        if '简体.srt' in filename:
-            f_list.append(filename)
-        if 'chs.srt' in filename:
-            f_list.append(filename)
-    the_file = f_list[0]
-    the_file_ext = f_list[0].split('.')[-1]
+    ext = file.split('.')[-1]
+    try:
+        f = rarfile.RarFile(file)
+    except:
+        f = zipfile.ZipFile(file)
+    f_list = []  # 字幕列表
+    if len(f.infolist()) == 1: # 当压缩包内只有一个文件时，那么就把该文件作为中文字幕文件
+        f_list.append(f.infolist()[0].filename)
+    else:
+        for s in f.infolist():
+            filename = s.filename
+            # print(filename)
+            if 'chs&eng.srt' in filename:
+                f_list.append(filename)
+            if '简体.srt' in filename:
+                f_list.append(filename)
+            if 'chs.srt' in filename:
+                f_list.append(filename)
+
+    the_file = f_list[0] # 从字幕列表里抓取第一个文件名作为字幕
+    the_file_ext = f_list[0].split('.')[-1] # 字幕扩展后缀名.srt
     print(the_file)
     with f.open(the_file) as x:
         for ln in x:
