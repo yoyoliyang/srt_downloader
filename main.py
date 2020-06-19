@@ -78,6 +78,7 @@ class SubUrl:
 
 
 def get_video_name():
+    # 获取当前目录视频文件的名称
     ls = os.walk('.')
     try:
         while True:
