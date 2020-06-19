@@ -110,11 +110,7 @@ def unc(file, sub_name):
         for s in f.infolist():
             filename = s.filename
             # print(filename)
-            if 'chs&eng.srt' in filename:
-                f_list.append(filename)
-            if '简体.srt' in filename:
-                f_list.append(filename)
-            if 'chs.srt' in filename:
+            if 'chs&eng' or '简体' or 'chs' or 'eng&chs' in filename:
                 f_list.append(filename)
 
     the_file = f_list[0] # 从字幕列表里抓取第一个文件名作为字幕
@@ -142,8 +138,10 @@ for index, sub in enumerate(subs, start=1):
 
 if subs:
     while True:
-        sub_choose = input('input download id:')
+        sub_choose = input('Input download id:')  # 选择下载的字幕文件，不选择默认第一个
         try:
+            if sub_choose == '':
+                sub_choose = 1
             sub_choose = int(sub_choose)
             break
         except ValueError:
