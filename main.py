@@ -10,8 +10,12 @@ import shutil
 
 token = 'sYEoLsFpxJ6nu7Rgk9DA8bjCZ1TBkSG9'
 
-def color(strings):
-    return "\033[4;33m{}\033[0m".format(strings)
+def color(strings, option=True):
+    if option == False:
+        return "\033[31m{}\033[0m".format(strings)
+    else:
+        return "\033[4;33m{}\033[0m".format(strings)
+
 
 class Subs:
 
@@ -92,9 +96,9 @@ def get_video_name():
 
 
 def unc(file, sub_name):
-    # file是下载后的文件，压缩包。sub_name视频文件名称，保存为sub_name.srt。
-    ext = file.split('.')[-1]
-    try:
+    # file是下载后的文件。sub_name视频文件名称，保存为sub_name.the_file_ext。
+    # ext = file.split('.')[-1]
+    try:  # 字幕压缩包有时是zip但实际是rar压缩格式，此处为了防止错误的扩展名压缩包
         f = rarfile.RarFile(file)
     except:
         f = zipfile.ZipFile(file)
@@ -119,7 +123,7 @@ def unc(file, sub_name):
     try:
         shutil.move(the_file, '{}.{}'.format(sub_name, the_file_ext))  # 移动文件到当前目录并重命名为影片名称
     except IndexError:
-        print('rename file error')
+        print(color('rename file error', False))
     print('write sub file complate')
 
 
