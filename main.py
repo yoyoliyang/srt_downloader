@@ -6,9 +6,12 @@ import os
 import re
 import rarfile
 import zipfile
+import shutil
 
 token = 'sYEoLsFpxJ6nu7Rgk9DA8bjCZ1TBkSG9'
 
+def color(strings):
+    return "\033[4;33m{}\033[0m".format(strings)
 
 class Subs:
 
@@ -111,12 +114,12 @@ def unc(file, sub_name):
 
     the_file = f_list[0] # 从字幕列表里抓取第一个文件名作为字幕
     the_file_ext = f_list[0].split('.')[-1] # 字幕扩展后缀名.srt
-    print(the_file)
-    with f.open(the_file) as x:
-        for ln in x:
-            with open(sub_name+'.'+the_file_ext, 'wb') as y:
-                for ln in x:
-                    y.write(ln)
+    print(color('{} >> {}.{}'.format(the_file, sub_name, the_file_ext)))
+    f.extract(the_file)
+    try:
+        shutil.move(the_file, '{}.{}'.format(sub_name, the_file_ext))  # 移动文件到当前目录并重命名为影片名称
+    except IndexError:
+        print('rename file error')
     print('write sub file complate')
 
 
@@ -157,7 +160,7 @@ if subs:
                     for chunk in r.iter_content(chunk_size=1024):
                         f.write(chunk)
                 print('', end='.')
-    print('download complate')
+    print(color('download complate'))
     file = get_video_name()
     print('change to the same name as the sub')
     unc(local_filename, file)
