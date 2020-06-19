@@ -47,7 +47,7 @@ class Subs:
                                     'langchs')
                                 if lang_langlist_langchs:
                                     subs_list.append(
-                                        f'sub_id={sub_id},vote_score={vote_score},videoname={videoname}')
+                                        f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
             return subs_list
         else:
             return None
@@ -134,7 +134,7 @@ while True:
 
 subs = Subs(sub_name).sub()
 for index, sub in enumerate(subs, start=1):
-    print(index, '<>', sub)
+    print(color(index), '<>', sub)
 
 if subs:
     while True:
