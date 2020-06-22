@@ -10,8 +10,9 @@ import shutil
 
 token = 'sYEoLsFpxJ6nu7Rgk9DA8bjCZ1TBkSG9'
 
+
 def color(strings, option=True):
-    if option == False:
+    if option is False:
         return "\033[31m{}\033[0m".format(strings)
     else:
         return "\033[4;33m{}\033[0m".format(strings)
@@ -47,7 +48,9 @@ class Subs:
                                     'langchs')
                                 if lang_langlist_langchs:
                                     subs_list.append(
-                                        f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
+                                        f'sub_id={sub_id},
+                                        vote_score={color(vote_score)},
+                                        videoname={videoname}')
             return subs_list
         else:
             return None
@@ -101,10 +104,10 @@ def unc(file, sub_name):
     # ext = file.split('.')[-1]
     try:  # 字幕压缩包有时是zip但实际是rar压缩格式，此处为了防止错误的扩展名压缩包
         f = rarfile.RarFile(file)
-    except:
+    except rarfile.BadRarFile:
         f = zipfile.ZipFile(file)
     f_list = []  # 字幕列表
-    if len(f.infolist()) == 1: # 当压缩包内只有一个文件时，那么就把该文件作为中文字幕文件
+    if len(f.infolist()) == 1:  # 当压缩包内只有一个文件时，那么就把该文件作为中文字幕文件
         f_list.append(f.infolist()[0].filename)
     else:
         for s in f.infolist():
@@ -113,12 +116,17 @@ def unc(file, sub_name):
             if 'chs&eng' or '简体' or 'chs' or 'eng&chs' in filename:
                 f_list.append(filename)
 
-    the_file = f_list[0] # 从字幕列表里抓取第一个文件名作为字幕
-    the_file_ext = f_list[0].split('.')[-1] # 字幕扩展后缀名.srt
+    try:
+        the_file = f_list[0]  # 从字幕列表里抓取第一个文件名作为字幕
+    except IndexError:
+        print('No chs subs found')
+        return None
+    the_file_ext = f_list[0].split('.')[-1]  # 字幕扩展后缀名.srt
     print(color('{} >> {}.{}'.format(the_file, sub_name, the_file_ext)))
     f.extract(the_file)
     try:
-        shutil.move(the_file, '{}.{}'.format(sub_name, the_file_ext))  # 移动文件到当前目录并重命名为影片名称
+        shutil.move(the_file, '{}.{}'.format(
+            sub_name, the_file_ext))  # 移动文件到当前目录并重命名为影片名称
     except IndexError:
         print(color('rename file error', False))
     print('write sub file complate')
@@ -162,7 +170,7 @@ if subs:
                 with open(local_filename, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=1024):
                         f.write(chunk)
-                print('', end='.')
+                        print('', end='.', flush=True)
     print(color('download complate'))
     file = get_video_name()
     print('change to the same name as the sub')
