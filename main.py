@@ -120,7 +120,7 @@ def unc(file, sub_name):
             if 'chs&eng' in s_filename \
                     or '简体' in s_filename \
                     or 'chs' in s_filename \
-                    or 'eng&chs' in s_filename:
+                    or '中文' in s_filename:
                 f_list.append(s_filename)
 
     try:
@@ -170,9 +170,11 @@ if subs:
                 for sub_id, _i in enumerate(subs_scores, start=1):
                     if _i == max(subs_scores):
                         sub_choose = sub_id
-            # sub_choose = int(sub_choose)
-            print('choose id:{}'.format(sub_choose))
-            break
+                        break
+            else:
+                print('choose id: {}'.format(sub_choose))
+                sub_choose = int(sub_choose)
+                break
         except ValueError:
             print('input error')
 
