@@ -47,7 +47,8 @@ class Subs:
                                 lang_langlist_langchs = lang_langlist.get(
                                     'langchs')
                                 if lang_langlist_langchs:
-                                    subs_list.append(f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
+                                    subs_list.append(
+                                        f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
             return subs_list
         else:
             return None
@@ -108,10 +109,14 @@ def unc(file, sub_name):
         f_list.append(f.infolist()[0].filename)
     else:
         for s in f.infolist():
-            filename = s.filename
+            s_filename = s.filename
             # print(filename)
-            if 'chs&eng' or '简体' or 'chs' or 'eng&chs' in filename:
-                f_list.append(filename)
+            if 'chs&eng' in s_filename \
+                    or '简体' in s_filename \
+                    or 'chs' in s_filename \
+                    or 'eng&chs' in s_filename:
+                f_list.append(s_filename)
+            print(f_list)
 
     try:
         the_file = f_list[0]  # 从字幕列表里抓取第一个文件名作为字幕
