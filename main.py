@@ -23,6 +23,8 @@ class Subs:
     def __init__(self, movie_name):
         self.movie_name = movie_name
 
+    _scores = []  # 暂存字幕评分
+
     def sub(self):
         url = f'http://api.assrt.net/v1/sub/search?token={token}&q={self.movie_name}'
         g = requests.get(url)
@@ -49,9 +51,13 @@ class Subs:
                                 if lang_langlist_langchs:
                                     subs_list.append(
                                         f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
+                                    Subs._scores.append(vote_score)
             return subs_list
         else:
             return None
+
+    def sub_score(self):
+        return Subs._scores
 
 
 class SubUrl:
@@ -116,7 +122,6 @@ def unc(file, sub_name):
                     or 'chs' in s_filename \
                     or 'eng&chs' in s_filename:
                 f_list.append(s_filename)
-            print(f_list)
 
     try:
         the_file = f_list[0]  # 从字幕列表里抓取第一个文件名作为字幕
@@ -131,28 +136,42 @@ def unc(file, sub_name):
             sub_name, the_file_ext))  # 移动文件到当前目录并重命名为影片名称
     except IndexError:
         print(color('rename file error', False))
-    print('write sub file complate')
+    print('写入字幕文件成功')
 
 
 # main func
 while True:
     sub_name = input('Input the movie name:')
-    if len(sub_name) <= 3:
-        print('error movie name')
+    if sub_name == '':
+        print('探测当前目录下的视频文件')
+        video_name = get_video_name()
+        try:
+            video_name_s = re.search(
+                '(\w*\.)*\d{4}\.', video_name)  # 获取视频文件的搜索关键字
+            sub_name = video_name_s.group(0)[:-1]  # 排除小数点
+            print(color('检索到视频关键字为：{}'.format(sub_name)))
+            break
+        except AttributeError:
+            print('检索视频关键字失败，请手动输入')
     else:
         break
 
-subs = Subs(sub_name).sub()
+subs_list = Subs(sub_name)
+subs = subs_list.sub()
+subs_scores = subs_list.sub_score()
 for index, sub in enumerate(subs, start=1):
     print(color(index), '<>', sub)
 
 if subs:
     while True:
-        sub_choose = input('Input download id:')  # 选择下载的字幕文件，不选择默认第一个
+        sub_choose = input('选择要下载的字幕id，回车自动选择评分最高字幕：')  # 选择下载的字幕文件，不选择默认第一个
         try:
             if sub_choose == '':
-                sub_choose = 1
-            sub_choose = int(sub_choose)
+                for sub_id, _i in enumerate(subs_scores, start=1):
+                    if _i == max(subs_scores):
+                        sub_choose = sub_id
+            # sub_choose = int(sub_choose)
+            print('choose id:{}'.format(sub_choose))
             break
         except ValueError:
             print('input error')
@@ -174,8 +193,7 @@ if subs:
                         f.write(chunk)
                         print('', end='.', flush=True)
     print(color('download complate'))
-    file = get_video_name()
-    print('change to the same name as the sub')
-    unc(local_filename, file)
+    print('正在重命名字幕文件')
+    unc(local_filename, video_name)
 else:
     print('subs not found')
