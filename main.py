@@ -47,10 +47,7 @@ class Subs:
                                 lang_langlist_langchs = lang_langlist.get(
                                     'langchs')
                                 if lang_langlist_langchs:
-                                    subs_list.append(
-                                        f'sub_id={sub_id},
-                                        vote_score={color(vote_score)},
-                                        videoname={videoname}')
+                                    subs_list.append(f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
             return subs_list
         else:
             return None
