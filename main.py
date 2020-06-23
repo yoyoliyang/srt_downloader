@@ -151,9 +151,10 @@ while True:
             sub_name = video_name_s.group(0)[:-1]  # 排除小数点
             print(color('检索到视频关键字为：{}'.format(sub_name)))
             break
-        except AttributeError:
+        except AttributeError and TypeError:
             print('检索视频关键字失败，请手动输入')
     else:
+        video_name = sub_name
         break
 
 subs_list = Subs(sub_name)
@@ -171,7 +172,7 @@ if subs:
                     if _i == max(subs_scores):
                         sub_choose = sub_id
                         break
-            else:
+            if int(sub_choose) >= 1 and int(sub_choose) <= len(subs):
                 print('choose id: {}'.format(sub_choose))
                 sub_choose = int(sub_choose)
                 break
