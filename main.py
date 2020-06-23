@@ -117,11 +117,11 @@ def unc(file, sub_name):
         for s in f.infolist():
             s_filename = s.filename
             # print(filename)
-            if 'chs&eng' in s_filename \
-                    or '简体' in s_filename \
-                    or 'chs' in s_filename \
-                    or '中文' in s_filename:
+            try:
+                _m = re.search('chs&eng|简体|chs|中文', s_filename)
                 f_list.append(s_filename)
+            except AttributeError:
+                print('.', end='', flush=True)
 
     try:
         the_file = f_list[0]  # 从字幕列表里抓取第一个文件名作为字幕
@@ -145,16 +145,22 @@ while True:
     if sub_name == '':
         print('探测当前目录下的视频文件')
         video_name = get_video_name()
-        try:
-            video_name_s = re.search(
-                '(\w*\.)*\d{4}\.', video_name)  # 获取视频文件的搜索关键字
-            sub_name = video_name_s.group(0)[:-1]  # 排除小数点
-            print(color('检索到视频关键字为：{}'.format(sub_name)))
-            break
-        except AttributeError and TypeError:
-            print('检索视频关键字失败，请手动输入')
+        # print(video_name)
+        if video_name is not None:  # 如果videoname不是空，那么进行正则判断
+            try:
+                video_name_s = re.search(
+                    '(\w*\.)*\d{4}\.', video_name)  # 获取视频文件的搜索关键字
+                sub_name = video_name_s.group(0)[:-1]  # 排除小数点
+                print(color('检索到视频关键字为：{}'.format(sub_name)))
+                break
+            except AttributeError or TypeError:
+                print('未搜索到正则关键词，尝试使用视频名称进行搜索')
+                sub_name = video_name
+                break
+        else:
+            print('请输入视频名称')
     else:
-        video_name = sub_name
+        video_name = sub_name  # 当前目录下没有找到视频文件时，使用输入的名称作为字幕文件
         break
 
 subs_list = Subs(sub_name)
@@ -176,6 +182,8 @@ if subs:
                 print('choose id: {}'.format(sub_choose))
                 sub_choose = int(sub_choose)
                 break
+            else:
+                print('input error')
         except ValueError:
             print('input error')
 
