@@ -119,6 +119,7 @@ def unc(file, sub_name):
             # print(filename)
             try:
                 _m = re.search('chs&eng|简体|chs|中文', s_filename)
+                # print(_m.group(0))
                 f_list.append(s_filename)
             except AttributeError:
                 print('.', end='', flush=True)
