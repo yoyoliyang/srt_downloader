@@ -33,25 +33,13 @@ class Subs:
         subs_list = []
         sub = dic_str.get('sub')
         if sub:
-            sub_result = sub.get('result')
-            if sub_result:
-                # print(sub_result)
-                sub_subs = sub.get('subs')  # 列表
-                if sub_subs:
-                    for sub_subs_list in sub_subs:
-                        sub_id = sub_subs_list.get('id')
-                        vote_score = sub_subs_list.get('vote_score')
-                        lang = sub_subs_list.get('lang')
-                        videoname = sub_subs_list.get('videoname')
-                        if lang:
-                            lang_langlist = lang.get('langlist')
-                            if lang_langlist:
-                                lang_langlist_langchs = lang_langlist.get(
-                                    'langchs')
-                                if lang_langlist_langchs:
-                                    subs_list.append(
-                                        f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
-                                    Subs._scores.append(vote_score)
+            for sub_info in sub['subs']:
+                sub_id = sub_info.get('id')
+                vote_score = sub_info.get('vote_score')
+                videoname = sub_info.get('videoname')
+                subs_list.append(
+                    f'sub_id={sub_id},vote_score={color(vote_score)},videoname={videoname}')
+                Subs._scores.append(vote_score)
             return subs_list
         else:
             return None
@@ -70,16 +58,11 @@ class SubUrl:
         g = requests.get(url)
         json_str = g.text
         dic = json.loads(json_str)
-        sub = dic.get('sub')
-        if sub:
-            sub_result = sub.get('result')
-            if sub_result:
-                sub_subs = sub.get('subs')
-                if sub_subs:
-                    for url in sub_subs:
-                        sub_subs_url = url.get('url')
-                        if sub_subs_url:
-                            return sub_subs_url
+        sub_subs = dic['sub']['subs']
+        for url in sub_subs:
+            sub_subs_url = url.get('url')
+            if sub_subs_url:
+                return sub_subs_url
         else:
             return None
 
@@ -118,7 +101,7 @@ def unc(file, sub_name):
             s_filename = s.filename
             # print(filename)
             try:
-                _m = re.search('chs&eng|简体|chs|中文', s_filename)
+                _m = re.search('特效|字幕|chs&eng|简体|chs|中文', s_filename)
                 _m.group(0)
                 f_list.append(s_filename)
             except AttributeError:
