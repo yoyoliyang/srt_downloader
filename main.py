@@ -97,21 +97,37 @@ def unc(file, sub_name):
     if len(f.infolist()) == 1:  # 当压缩包内只有一个文件时，那么就把该文件作为中文字幕文件
         f_list.append(f.infolist()[0].filename)
     else:
-        for s in f.infolist():
-            s_filename = s.filename
-            # print(filename)
+        select_number = {}  # 手动选择
+        for index, s in enumerate(f.infolist(), start=1):
+            select_number[index] = s.filename
             try:
-                _m = re.search('特效|字幕|chs&eng|简体|chs|中文', s_filename)
+                _m = re.search(
+                    '特效|字幕|chs&eng|简体|chs|中文', s.filename)
                 _m.group(0)
-                f_list.append(s_filename)
+                f_list.append(s.filename)
             except AttributeError:
                 print('.', end='', flush=True)
+                if index == len(f.infolist()):
+                    print('.\n')
 
     try:
         the_file = f_list[0]  # 从字幕列表里抓取第一个文件名作为字幕
     except IndexError:
-        print('No chs subs found')
-        return None
+        if len(f.infolist()) > 1:
+            for i in select_number:
+                print(f'{color(i)} <> {select_number[i]}')
+            while True:
+                select_file = input('没有找到匹配字幕，手动选择编号:')
+                try:
+                    if int(select_file) in select_number.keys():
+                        f_list.append(select_number[int(select_file)])
+                        the_file = f_list[0]
+                        break
+                except ValueError:
+                    print('输入错误')
+        else:
+            print('No chs subs found')
+            return None
     the_file_ext = f_list[0].split('.')[-1]  # 字幕扩展后缀名.srt
     print(color('{} >> {}.{}'.format(the_file, sub_name, the_file_ext)))
     f.extract(the_file)
